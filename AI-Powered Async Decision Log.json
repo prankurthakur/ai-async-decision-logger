@@ -1,0 +1,173 @@
+{
+  "name": "AI-Powered Async Decision Log",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are an AI assistant that extracts structured decision data.\n\nFrom the text below, return ONLY valid JSON.\n\nText:\n{{$json.body.raw_text}}\n\nReturn JSON with exactly these keys:\n- decision_summary\n- context\n- alternatives_considered\n- final_choice_and_rationale\n- owner\n- deadline\n- risks\n\nRules:\n- Output must be valid JSON.\n- Do not include explanations.\n- Do not include markdown.\n- If a field is missing, return an empty string."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "5d8983de-0118-48d5-bc81-47a870acc15e",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YoreM7BczxIz6Wyl",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const textOutput = $json.output[0].content[0].text;\n\nconst parsed = JSON.parse(textOutput);\n\nreturn [\n  {\n    decision_summary: parsed.decision_summary || \"\",\n    context: parsed.context || \"\",\n    alternatives_considered: parsed.alternatives_considered || \"\",\n    final_choice_and_rationale: parsed.final_choice_and_rationale || \"\",\n    owner: parsed.owner || \"\",\n    deadline: parsed.deadline || \"\",\n    risks: parsed.risks || \"\"\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        0
+      ],
+      "id": "0df20e58-8c68-4860-8f8a-fbaf7d768544",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "3105984d-46ec-80c7-bd88-ded36944d392",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "title": "={{$json.decision_summary}}",
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Context|rich_text",
+              "textContent": "={{$json.context}}"
+            },
+            {
+              "key": "Alternatives Considered|rich_text",
+              "textContent": "={{$json.alternatives_considered}}"
+            },
+            {
+              "key": "Final Choice & Rationale|rich_text",
+              "textContent": "={{$json.final_choice_and_rationale}}"
+            },
+            {
+              "key": "Owner |rich_text",
+              "textContent": "={{$json.owner}}"
+            },
+            {
+              "key": "Deadline|date",
+              "includeTime": false,
+              "date": "={{ new Date($json.deadline).toISOString().split('T')[0] }}"
+            },
+            {
+              "key": "Risks|rich_text",
+              "textContent": "={{$json.risks}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        0
+      ],
+      "id": "9355b833-9467-47c9-aea7-9591642c01cd",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "gruO4IiLVrDvP5eu",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d15b98db-2c96-4b39-8726-d14de9381ffe",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        0
+      ],
+      "id": "2aa60147-f520-45f4-b6f1-ae228269dac3",
+      "name": "Webhook",
+      "webhookId": "d15b98db-2c96-4b39-8726-d14de9381ffe"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "4ba51d41-ae5b-49ce-800d-aaabfd3cabfd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ed790cd6f70b834bcd11e739f92f5dc879abf7286e9d8bd182e13c90b13809f7"
+  },
+  "id": "H73PRPSj9VuRBXQb",
+  "tags": []
+}
