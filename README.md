@@ -34,6 +34,8 @@ Structured JSON Output
 Notion Database Entry
 Decision Structure
 
+Demo Video Link: https://drive.google.com/file/d/1o7b3edgkwnr8NT1v0MHVF475_g6ZEaUU/view?usp=sharing
+
 Each decision is stored with:
 
 • Decision Summary
@@ -94,8 +96,7 @@ Future Improvements
 • Automatic triggering
 • Multi-language support for global teams
 
-Screenshots
-
+Screenshots:
 Screenshots are included in the repository.
 
 Author:
